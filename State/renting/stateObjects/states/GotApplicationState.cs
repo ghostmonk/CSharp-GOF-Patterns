@@ -2,7 +2,7 @@
 
 namespace State.renting.stateObjects.states
 {
-    class GotApplicationState : BaseState
+    public class GotApplicationState : BaseState
     {
         private IAutomat automat;
 

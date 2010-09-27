@@ -1,6 +1,6 @@
 ﻿namespace State.renting.stateObjects.states
 {
-    class ApartmentRentedState : BaseState
+    public class ApartmentRentedState : BaseState
     {
         private IAutomat automat;
 

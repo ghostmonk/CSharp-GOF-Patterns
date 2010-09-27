@@ -4,9 +4,11 @@ namespace Observer.subjects
 {
     public class Database : Subject
     {
-        private List<observers.Observer> observers = new List<observers.Observer>();
+        private readonly List<observers.Observer> observers = new List<observers.Observer>();
         private string operation;
         private string record;
+
+        #region Subject Members
 
         public void RegisterObserver( observers.Observer observer )
         {
@@ -25,6 +27,8 @@ namespace Observer.subjects
                 currentObserver.Update( operation, record );
             }
         }
+
+        #endregion
 
         public void EditRecord( string operation, string record )
         {

@@ -1,6 +1,6 @@
 ﻿namespace State.renting.stateObjects.states
 {
-    class FullyRentedState : BaseState
+    public class FullyRentedState : BaseState
     {
         private IAutomat automat;
 

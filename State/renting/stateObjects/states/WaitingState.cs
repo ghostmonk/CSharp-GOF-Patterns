@@ -2,7 +2,7 @@
 
 namespace State.renting.stateObjects.states
 {
-    class WaitingState : BaseState
+    public class WaitingState : BaseState
     {
         private IAutomat automat;
 
