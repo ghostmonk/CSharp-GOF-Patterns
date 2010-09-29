@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Mediator.Shops;
 
-namespace Proxy
+namespace Mediator
 {
     class Program
     {
         public Program()
         {
-            new AutomatServer();
+            new CustomerProcess().Handle( ProcessType.Welcome );
         }
-        
+
         static void Main( string[] args )
         {
             new Program();

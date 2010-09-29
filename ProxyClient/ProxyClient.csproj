@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D22759DC-29A3-4C7E-83AC-ED9F6542A3C8}</ProjectGuid>
+    <ProjectGuid>{79FDA082-7B4D-4C8F-BA91-16B13DB1C43B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Proxy</RootNamespace>
-    <AssemblyName>Proxy</AssemblyName>
+    <RootNamespace>ProxyClient</RootNamespace>
+    <AssemblyName>ProxyClient</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -44,15 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutomatProxy.cs" />
-    <Compile Include="AutomatServer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\State\State.csproj">
-      <Project>{98CD4091-D512-40A0-8406-D9BE5DD139DC}</Project>
-      <Name>State</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

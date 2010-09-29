@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Net.Sockets;
@@ -10,11 +9,12 @@ using State.renting.stateObjects.states;
 
 namespace Proxy
 {
-    class AutomatServer : IAutomat
+    internal class AutomatServer : IAutomat
     {
         private BaseState state;
         private Thread thread;
         private TcpListener server;
+        private NetworkStream currentStream;
 
         public AutomatServer()
         {
@@ -26,6 +26,7 @@ namespace Proxy
             state = WaitingState;
 
             thread = new Thread( Run );
+            thread.Start();
         }
 
         public int NumberOfApartments { get; set; }
@@ -40,24 +41,31 @@ namespace Proxy
 
         public void GotApplication()
         {
-            state.GotApplication();
+            SendToClient( state.GotApplication() );
         }
 
         public void CheckApplication()
         {
-            state.CheckApplication();
-            if( state == ApartmentRentedState ) RentApartment();
+            SendToClient( state.CheckApplication() );
+            if( state == ApartmentRentedState )
+                RentApartment();
         }
 
         public void RentApartment()
         {
-            state.RentApartment();
-            state.DispenseKeys();
+            SendToClient( state.RentApartment() );
+            SendToClient( state.DispenseKeys() );
         }
 
         public void SetState( BaseState state )
         {
             this.state = state;
+        }
+
+        private void SendToClient( string msg )
+        {
+            byte[] response = Encoding.ASCII.GetBytes( msg );
+            currentStream.Write( response, 0, msg.Length );
         }
 
         private void Run()
@@ -75,11 +83,10 @@ namespace Proxy
                     Thread clientThread = new Thread( ConnectedTcpClient );
                     clientThread.Start( client );
                 }
-                
             }
             catch( SocketException ex )
             {
-                Console.WriteLine("Socet Exception: {0}", ex.Message);
+                Console.WriteLine( "Socet Exception: {0}", ex.Message );
             }
         }
 
@@ -90,19 +97,26 @@ namespace Proxy
             {
                 NetworkStream stream = tcpClient.GetStream();
                 int i;
-            
+
+                string command = String.Empty;
                 Byte[] bytes = new Byte[256];
-                string data;
 
-                while( ( i = stream.Read( bytes, 0, bytes.Length ) ) != 0 )
+                int bufferSize = 0;
+
+                while( ( i = stream.Read( bytes, bufferSize, bytes.Length - bufferSize ) ) != 0 )
                 {
-                    data = Encoding.ASCII.GetString( bytes, 0, i );
-                    Console.WriteLine( "Recieved: {0}", data );
-                    data = data.ToUpper();
-                    byte[] msg = Encoding.ASCII.GetBytes( data );
+                    bufferSize += i;
 
-                    stream.Write( msg, 0, msg.Length );
-                    Console.WriteLine( "Sent: {0}", data );
+                    int x = 0;
+                    while( x < bufferSize )
+                    {
+                        if( bytes[ x++ ] != '\n' ) continue;
+
+                        InvokeCmd( Encoding.ASCII.GetString( bytes, 0, x - 1 ), tcpClient );
+                        bufferSize -= x;
+                        Buffer.BlockCopy( bytes, x, bytes, 0, bufferSize );
+                        x = 0;
+                    }
                 }
 
                 tcpClient.Close();
@@ -110,6 +124,30 @@ namespace Proxy
             catch( SocketException ex )
             {
                 Console.WriteLine( "Socket Exception: {0}", ex.Message );
+            }
+            catch( IOException ex )
+            {
+                Console.WriteLine( "Exception: {0}", ex.Message );
+            }
+        }
+
+        private void InvokeCmd( string command, TcpClient client )
+        {
+            currentStream = client.GetStream();
+            switch( command )
+            {
+                case "check":
+                    CheckApplication();
+                    break;
+                case "apply":
+                    GotApplication();
+                    break;
+                case "rent":
+                    RentApartment();
+                    break;
+                default:
+                    Console.WriteLine( "Unknown Command: {0}", command );
+                    break;
             }
         }
     }
